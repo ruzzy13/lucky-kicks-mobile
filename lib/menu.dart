@@ -7,11 +7,22 @@ class MyHomePage extends StatelessWidget {
   final String npm = "2406495451";
   final String kelas = "C";
 
+  // =======================================================================
+  // PERUBAHAN HANYA DI BAGIAN INI
+  // =======================================================================
   final List<ItemHomepage> items = [
-    ItemHomepage("All Products", Icons.newspaper),
-    ItemHomepage("My Products", Icons.add),
-    ItemHomepage("Create Product", Icons.logout),
+    // 1. All Products: Tetap menggunakan Icons.newspaper
+    ItemHomepage("All Products", Icons.newspaper, Colors.blue),
+    
+    // 2. My Products: Ikonnya disamakan dengan All Products (Icons.newspaper)
+    ItemHomepage("My Products", Icons.newspaper, Colors.green),
+    
+    // 3. Create Product: Ikonnya diubah menjadi ikon My Products sebelumnya (Icons.add)
+    ItemHomepage("Create Product", Icons.add, Colors.red),
   ];
+  // =======================================================================
+  // TIDAK ADA PERUBAHAN PADA KODE DI BAWAH INI
+  // =======================================================================
 
   @override
   Widget build(BuildContext context) {
@@ -121,11 +132,13 @@ class InfoCard extends StatelessWidget {
   }
 }
 
+// Menambahkan property color di class ItemHomepage
 class ItemHomepage {
   final String name;
   final IconData icon;
+  final Color color; // <-- DITAMBAHKAN
 
-  ItemHomepage(this.name, this.icon);
+  ItemHomepage(this.name, this.icon, this.color); // <-- DIPERBARUI
 }
 
 class ItemCard extends StatelessWidget {
@@ -138,8 +151,8 @@ class ItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      // Menentukan warna latar belakang dari tema aplikasi.
-      color: Theme.of(context).colorScheme.secondary,
+      // Menggunakan warna dari 'item.color'
+      color: item.color, // <-- DIPERBARUI (sebelumnya: Theme.of(context).colorScheme.secondary)
       // Membuat sudut kartu melengkung.
       borderRadius: BorderRadius.circular(12),
 
