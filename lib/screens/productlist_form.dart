@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lucky_kicks/widgets/left_drawer.dart';
+import 'dart:convert';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart'; 
+import 'package:lucky_kicks/screens/menu.dart'; 
 
 class ProductFormPage extends StatefulWidget {
   const ProductFormPage({super.key});
@@ -13,11 +17,11 @@ class _ProductFormPageState extends State<ProductFormPage> {
 
   String _title = "";
   int _price = 0;
-  int _stock = 0; 
+  int _stock = 0;
   String _content = "";
   String _category = "apparel";
   String _thumbnail = "";
-  bool _isFeatured = false; // Nilai default
+  bool _isFeatured = false; 
 
   final List<String> _categories = [
     'apparel',
@@ -27,6 +31,9 @@ class _ProductFormPageState extends State<ProductFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Mendapatkan request dari Provider
+    final request = context.watch<CookieRequest>();
+    
     return Scaffold(
       appBar: AppBar(
         title: const Center(child: Text('Add Product Form')),
@@ -40,6 +47,8 @@ class _ProductFormPageState extends State<ProductFormPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // ... (Semua TextFormField dan Dropdown tetap sama) ...
+              
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
@@ -57,7 +66,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                   },
                   validator: (String? value) {
                     if (value == null || value.isEmpty) {
-                      return "Judul tidak boleh kosong!";
+                      return "Title can't be empty!";
                     }
                     return null;
                   },
@@ -196,7 +205,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                   },
                   validator: (String? value) {
                     if (value == null || value.isEmpty) {
-                      return "URL thumbnail tidak boleh kosong!";
+                      return "URL Thumbnail can't be empty!";
                     }
                     final uri = Uri.tryParse(value);
                     if (uri == null ||
@@ -221,7 +230,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                   },
                 ),
               ),
-
+              
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
@@ -230,48 +239,43 @@ class _ProductFormPageState extends State<ProductFormPage> {
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(Colors.indigo),
                     ),
-
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Berita berhasil disimpan!'),
-                              content: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Name: $_title'),
-                                    Text('Price: $_price'),
-                                    Text('Stock: $_stock'), 
-                                    Text('Description: $_content'),
-                                    Text('Category: $_category'),
-                                    Text('Thumbnail: $_thumbnail'),
-                                    Text(
-                                      'Featured: ${_isFeatured ? "Yes" : "No"}',
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    _formKey.currentState!.reset();
-                                    setState(() {
-                                      _category = "apparel";
-                                      _isFeatured = false;
-                                      _price = 0;
-                                      _stock = 0;
-                                    });
-                                  },
-                                ),
-                              ],
-                            );
-                          },
+                        // TODO: Ganti URL dengan URL aplikasi Anda!
+                        // Gunakan http://10.0.2.2/ untuk emulator Android
+                        // Gunakan http://localhost:8000/ jika di browser
+                        
+                        final response = await request.postJson(
+                          "http://127.0.0.1:8000/create-flutter/",
+                          jsonEncode({
+                            "title": _title,
+                            "price": _price.toString(),
+                            "stock": _stock.toString(), 
+                            "content": _content,
+                            "thumbnail": _thumbnail,
+                            "category": _category,
+                            "is_featured": _isFeatured,
+                          }),
                         );
+                        if (context.mounted) {
+                          if (response['status'] == 'success') {
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(
+                              content: Text("Product successfully saved!"),
+                            ));
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => MyHomePage()),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(
+                              content: Text(
+                                  "Something went wrong, please try again."),
+                            ));
+                          }
+                        }
                       }
                     },
                     child: const Text(

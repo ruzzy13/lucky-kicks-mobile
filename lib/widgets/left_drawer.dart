@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucky_kicks/screens/menu.dart';
 import 'package:lucky_kicks/screens/productlist_form.dart';
+import 'package:lucky_kicks/screens/product_entry_list.dart'; // Import halaman list baru
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -58,6 +59,19 @@ class LeftDrawer extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const ProductFormPage(),
+                ),
+              );
+            },
+          ),
+          // ListTile BARU untuk melihat semua produk
+          ListTile(
+            leading: const Icon(Icons.checklist),
+            title: const Text('All Products'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProductEntryListPage(),
                 ),
               );
             },
